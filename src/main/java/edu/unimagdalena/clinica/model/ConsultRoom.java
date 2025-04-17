@@ -1,11 +1,11 @@
 package edu.unimagdalena.clinica.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+
+import java.util.Set;
 
 @Entity
 @Data
@@ -18,10 +18,12 @@ public class ConsultRoom {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String fullName;
+    private String name;
 
-    @Email
-    private String email;
+    private Integer floor;
 
-    private String phone;
+    private String description;
+
+    @OneToMany(mappedBy = "consult_room")
+    private Set<Appointment> appointments;
 }

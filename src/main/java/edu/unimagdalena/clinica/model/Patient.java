@@ -1,10 +1,11 @@
 package edu.unimagdalena.clinica.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+
+import java.util.Set;
 
 @Entity
 @Data
@@ -19,7 +20,14 @@ public class Patient {
 
     private String fullName;
 
-    private Integer floor;
+    @Email
+    private String email;
 
-    private String description;
+    private String phone;
+
+    @OneToMany(mappedBy = "patient")
+    private Set<Appointment> appointments;
+
+    @OneToMany(mappedBy = "patient")
+    private Set<MedicalRecord> medicalRecords;
 }
