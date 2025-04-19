@@ -27,7 +27,7 @@ public class Appointment {
 
     @ManyToOne
     @JoinColumn(name = "consult_room_id", referencedColumnName = "id")
-    private ConsultRoom consult_room;
+    private ConsultRoom consultRoom;
 
     @Future
     private LocalDateTime startTime;
