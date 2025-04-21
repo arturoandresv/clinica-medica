@@ -1,18 +1,19 @@
 package edu.unimagdalena.clinica.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import edu.unimagdalena.clinica.model.AppointmentStatus;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import lombok.Builder;
 
 import java.time.LocalDateTime;
 
+@Builder
 public record AppointmentDTO(Long id,
                              Long patientId,
                              Long doctorId,
                              Long consultRoomId,
                              LocalDateTime startTime,
                              LocalDateTime endTime,
-                             @Enumerated(EnumType.STRING)
+                             @JsonFormat(shape = JsonFormat.Shape.STRING)
                              AppointmentStatus status) {
 }
 

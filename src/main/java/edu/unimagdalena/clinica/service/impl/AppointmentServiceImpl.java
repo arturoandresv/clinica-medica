@@ -16,6 +16,7 @@ import edu.unimagdalena.clinica.service.AppointmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -85,7 +86,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         Appointment existing = appointmentRepository.findById(id)
                 .orElseThrow(()-> new AppointmentNotFoundException("Appointment not found with id: " + id));
 
-        if(!(appointmentDTO.status() == AppointmentStatus.SCHEDULED)) {
+        if((existing.getStatus() != AppointmentStatus.SCHEDULED)) {
             throw new AppointmentNotModifiableException("Appointment not modifiable");
         }
 
@@ -122,11 +123,11 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new AppointmentConflictException("The consult room already has an appointment at this time.");
         }
 
-        if(doctor.getAvailableFrom().isAfter(appointmentDTO.startTime().toLocalTime()) || doctor.getAvailableTo().isBefore(appointmentDTO.endTime().toLocalTime())) {
+        LocalTime start = appointmentDTO.startTime().toLocalTime();
+        LocalTime end = appointmentDTO.endTime().toLocalTime();
+        if (start.isBefore(doctor.getAvailableFrom()) || end.isAfter(doctor.getAvailableTo())) {
             throw new DoctorScheduleConflictException("Doctor schedule conflict");
         }
-
-
 
         existing.setPatient(patient);
         existing.setDoctor(doctor);
