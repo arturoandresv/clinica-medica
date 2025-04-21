@@ -1,13 +1,13 @@
 package edu.unimagdalena.clinica.service;
 
-import edu.unimagdalena.clinica.dto.ConsultRoomDTO;
+import edu.unimagdalena.clinica.dto.response.ConsultRoomResponseDTO;
 
 import java.util.List;
 
 public interface ConsultRoomService {
-    List<ConsultRoomDTO> getConsultRooms();
-    ConsultRoomDTO getConsultRoomById(Long id);
-    ConsultRoomDTO createConsultRoom(ConsultRoomDTO consultRoomDTO);
-    ConsultRoomDTO updateConsultRoom(Long id, ConsultRoomDTO consultRoomDTO);
+    List<ConsultRoomResponseDTO> getConsultRooms();
+    ConsultRoomResponseDTO getConsultRoomById(Long id);
+    ConsultRoomResponseDTO createConsultRoom(ConsultRoomResponseDTO consultRoomResponseDTO);
+    ConsultRoomResponseDTO updateConsultRoom(Long id, ConsultRoomResponseDTO consultRoomResponseDTO);
     void deleteConsultRoom(Long id);
 }

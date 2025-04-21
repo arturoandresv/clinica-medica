@@ -1,6 +1,8 @@
 package edu.unimagdalena.clinica.service;
 
-import edu.unimagdalena.clinica.dto.AppointmentDTO;
+import edu.unimagdalena.clinica.dto.request.AppointmentRequestCreateDTO;
+import edu.unimagdalena.clinica.dto.request.AppointmentRequestUpdateDTO;
+import edu.unimagdalena.clinica.dto.response.AppointmentResponseDTO;
 import edu.unimagdalena.clinica.exception.AppointmentConflictException;
 import edu.unimagdalena.clinica.exception.DoctorScheduleConflictException;
 import edu.unimagdalena.clinica.mapper.AppointmentMapper;
@@ -47,12 +49,12 @@ class AppointmentServiceTest {
     @Test
     void shouldGetAllAppointments() {
         Appointment appointment = Appointment.builder().id(1L).build();
-        AppointmentDTO appointmentDTO = AppointmentDTO.builder().id(1L).build();
+        AppointmentResponseDTO appointmentResponseDTO = AppointmentResponseDTO.builder().id(1L).build();
 
         when(appointmentRepository.findAll()).thenReturn(List.of(appointment));
-        when(appointmentMapper.toDTO(appointment)).thenReturn(appointmentDTO);
+        when(appointmentMapper.toDTO(appointment)).thenReturn(appointmentResponseDTO);
 
-        List<AppointmentDTO> result = appointmentService.getAllAppointments();
+        List<AppointmentResponseDTO> result = appointmentService.getAllAppointments();
 
         assertEquals(1, result.size());
     }
@@ -60,23 +62,22 @@ class AppointmentServiceTest {
     @Test
     void shouldGetAppointmentById() {
         Appointment appointment = Appointment.builder().id(1L).build();
-        AppointmentDTO appointmentDTO = AppointmentDTO.builder().id(1L).build();
+        AppointmentResponseDTO appointmentResponseDTO = AppointmentResponseDTO.builder().id(1L).build();
 
         when(appointmentRepository.findById(1L)).thenReturn(Optional.of(appointment));
-        when(appointmentMapper.toDTO(appointment)).thenReturn(appointmentDTO);
+        when(appointmentMapper.toDTO(appointment)).thenReturn(appointmentResponseDTO);
 
-        AppointmentDTO result = appointmentService.getAppointmentById(1L);
+        AppointmentResponseDTO result = appointmentService.getAppointmentById(1L);
 
-        assertEquals(appointmentDTO, result);
+        assertEquals(appointmentResponseDTO, result);
     }
 
     @Test
     void shouldCreateAppointment() {
-        AppointmentDTO appointmentDTO = AppointmentDTO.builder()
+        AppointmentRequestCreateDTO appointmentRequestCreateDTO = AppointmentRequestCreateDTO.builder()
                 .patientId(1L).doctorId(1L).consultRoomId(1L)
                 .startTime(LocalDateTime.now().plusDays(1))
                 .endTime(LocalDateTime.now().plusDays(1).plusHours(1))
-                .status(AppointmentStatus.SCHEDULED)
                 .build();
 
         Patient patient = Patient.builder().id(1L).build();
@@ -89,6 +90,13 @@ class AppointmentServiceTest {
                 .patient(patient).doctor(doctor).consultRoom(consultRoom)
                 .build();
 
+        AppointmentResponseDTO appointmentResponseDTO = AppointmentResponseDTO.builder().id(1L)
+                .patientId(1L).doctorId(1L).consultRoomId(1L)
+                .startTime(LocalDateTime.now().plusDays(1))
+                .endTime(LocalDateTime.now().plusDays(1))
+                .status(AppointmentStatus.SCHEDULED)
+                .build();
+
         when(patientRepository.findById(1L)).thenReturn(Optional.of(patient));
         when(doctorRepository.findById(1L)).thenReturn(Optional.of(doctor));
         when(consultRoomRepository.findById(1L)).thenReturn(Optional.of(consultRoom));
@@ -96,9 +104,9 @@ class AppointmentServiceTest {
         when(appointmentRepository.findConflictConsultRoom(eq(1L), any(), any())).thenReturn(List.of());
         when(appointmentMapper.toEntity(any())).thenReturn(appointment);
         when(appointmentRepository.save(any())).thenReturn(appointment);
-        when(appointmentMapper.toDTO(any())).thenReturn(appointmentDTO);
+        when(appointmentMapper.toDTO(any())).thenReturn(appointmentResponseDTO);
 
-        AppointmentDTO result = appointmentService.createAppointment(appointmentDTO);
+        AppointmentResponseDTO result = appointmentService.createAppointment(appointmentRequestCreateDTO);
 
         assertEquals(1L, result.patientId());
         assertEquals(1L, result.doctorId());
@@ -107,54 +115,55 @@ class AppointmentServiceTest {
 
     @Test
     void shouldUpdateAppointment() {
+        LocalDateTime now = LocalDateTime.of(2025, 4, 20, 10, 0);
+        LocalDateTime existingStart = now.plusDays(1);
+        LocalDateTime existingEnd = existingStart.plusHours(1);
+        LocalDateTime newStart = now.plusDays(2).minusHours(1);
+        LocalDateTime newEnd = now.plusDays(2);
+
+        LocalDateTime updatedDTOStart = now.plusDays(2).plusHours(3);
+        LocalDateTime updatedDTOEnd = now.plusDays(2).plusHours(4);
+
         Appointment existing = Appointment.builder().id(1L)
                 .patient(Patient.builder().id(1L).build())
                 .doctor(Doctor.builder().id(1L)
-                        .availableFrom(LocalTime.now().minusHours(2))
-                        .availableTo(LocalTime.now().plusHours(2)).build())
+                        .availableFrom(LocalTime.of(8, 0))
+                        .availableTo(LocalTime.of(18, 0)).build())
                 .consultRoom(ConsultRoom.builder().id(1L).build())
-                .startTime(LocalDateTime.now().plusDays(1))
-                .endTime(LocalDateTime.now().plusDays(1).plusHours(1))
+                .startTime(existingStart)
+                .endTime(existingEnd)
                 .status(AppointmentStatus.SCHEDULED)
                 .build();
 
-        AppointmentDTO updateDTO = AppointmentDTO.builder()
-                .patientId(1L).doctorId(2L).consultRoomId(2L)
-                .startTime(LocalDateTime.now().plusDays(2).plusHours(3))
-                .endTime(LocalDateTime.now().plusDays(2).plusHours(4))
+        AppointmentRequestUpdateDTO requestUpdate = AppointmentRequestUpdateDTO.builder()
+                .startTime(newStart)
+                .endTime(newEnd)
                 .status(AppointmentStatus.SCHEDULED)
                 .build();
 
-        Patient patient = Patient.builder().id(1L).build();
-        Doctor doctor = Doctor.builder().id(2L)
-                .availableFrom(LocalTime.now())
-                .availableTo(LocalTime.now().plusHours(5)).build();
-        ConsultRoom consultRoom = ConsultRoom.builder().id(2L).build();
-
-        Appointment update = Appointment.builder().id(1L)
-                .patient(patient)
-                .doctor(doctor)
-                .consultRoom(consultRoom)
-                .startTime(LocalDateTime.now().plusDays(2).plusHours(3))
-                .endTime(LocalDateTime.now().plusDays(2).plusHours(4))
+        AppointmentResponseDTO update = AppointmentResponseDTO.builder()
+                .patientId(1L)
+                .doctorId(1L)
+                .consultRoomId(1L)
+                .startTime(updatedDTOStart)
+                .endTime(updatedDTOEnd)
                 .status(AppointmentStatus.SCHEDULED)
                 .build();
 
         when(appointmentRepository.findById(1L)).thenReturn(Optional.of(existing));
-        when(patientRepository.findById(1L)).thenReturn(Optional.of(patient));
-        when(doctorRepository.findById(2L)).thenReturn(Optional.of(doctor));
-        when(consultRoomRepository.findById(2L)).thenReturn(Optional.of(consultRoom));
-        when(appointmentRepository.findConflictDoctor(eq(2L), any(), any())).thenReturn(List.of());
-        when(appointmentRepository.findConflictConsultRoom(eq(2L), any(), any())).thenReturn(List.of());
-        when(appointmentRepository.save(existing)).thenReturn(update);
-        when(appointmentMapper.toDTO(update)).thenReturn(updateDTO);
+        when(appointmentRepository.findConflictDoctor(eq(1L), any(), any())).thenReturn(List.of());
+        when(appointmentRepository.findConflictConsultRoom(eq(1L), any(), any())).thenReturn(List.of());
+        when(appointmentRepository.save(any())).thenReturn(existing);
+        when(appointmentMapper.toDTO(any())).thenReturn(update);
 
-        AppointmentDTO result = appointmentService.updateAppointment(1L, updateDTO);
+        AppointmentResponseDTO result = appointmentService.updateAppointment(1L, requestUpdate);
 
+        assertEquals(updatedDTOStart, result.startTime());
+        assertEquals(updatedDTOEnd, result.endTime());
+        assertEquals(AppointmentStatus.SCHEDULED, result.status());
+        assertEquals(1L, result.doctorId());
         assertEquals(1L, result.patientId());
-        assertEquals(2L, result.doctorId());
-        assertEquals(2L, result.consultRoomId());
-
+        assertEquals(1L, result.consultRoomId());
     }
 
     @Test
@@ -168,11 +177,10 @@ class AppointmentServiceTest {
 
     @Test
     void shouldThrowIfAppointmentConflictExists() {
-        AppointmentDTO appointmentDTO = AppointmentDTO.builder()
+        AppointmentRequestCreateDTO appointmentRequestCreateDTO = AppointmentRequestCreateDTO.builder()
                 .patientId(1L).doctorId(1L).consultRoomId(1L)
                 .startTime(LocalDateTime.now().plusDays(1))
                 .endTime(LocalDateTime.now().plusDays(1).plusHours(1))
-                .status(AppointmentStatus.SCHEDULED)
                 .build();
 
         Patient patient = Patient.builder().id(1L).build();
@@ -191,18 +199,17 @@ class AppointmentServiceTest {
         when(appointmentRepository.findConflictDoctor(eq(1L), any(), any())).thenReturn(List.of(appointment));
         when(appointmentRepository.findConflictConsultRoom(eq(1L), any(), any())).thenReturn(List.of(appointment));
 
-        assertThrows(AppointmentConflictException.class, () -> appointmentService.createAppointment(appointmentDTO));
+        assertThrows(AppointmentConflictException.class, () -> appointmentService.createAppointment(appointmentRequestCreateDTO));
     }
     @Test
     void shouldThrowIfDoctorScheduleConflict() {
         LocalDateTime start = LocalDateTime.of(2025, 4, 21, 19, 0);
         LocalDateTime end = start.plusHours(1);
 
-        AppointmentDTO appointmentDTO = AppointmentDTO.builder()
+        AppointmentRequestCreateDTO appointmentRequestCreateDTO = AppointmentRequestCreateDTO.builder()
                 .patientId(1L).doctorId(1L).consultRoomId(1L)
                 .startTime(start)
                 .endTime(end)
-                .status(AppointmentStatus.SCHEDULED)
                 .build();
 
         Patient patient = Patient.builder().id(1L).build();
@@ -218,6 +225,6 @@ class AppointmentServiceTest {
         when(consultRoomRepository.findById(1L)).thenReturn(Optional.of(consultRoom));
 
         assertThrows(DoctorScheduleConflictException.class, () ->
-                appointmentService.createAppointment(appointmentDTO));
+                appointmentService.createAppointment(appointmentRequestCreateDTO));
     }
 }

@@ -1,6 +1,8 @@
 package edu.unimagdalena.clinica.service.impl;
 
-import edu.unimagdalena.clinica.dto.AppointmentDTO;
+import edu.unimagdalena.clinica.dto.request.AppointmentRequestCreateDTO;
+import edu.unimagdalena.clinica.dto.request.AppointmentRequestUpdateDTO;
+import edu.unimagdalena.clinica.dto.response.AppointmentResponseDTO;
 import edu.unimagdalena.clinica.exception.*;
 import edu.unimagdalena.clinica.exception.notfound.AppointmentNotFoundException;
 import edu.unimagdalena.clinica.exception.notfound.ConsultRoomNotFoundException;
@@ -30,36 +32,36 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final AppointmentMapper appointmentMapper;
 
     @Override
-    public List<AppointmentDTO> getAllAppointments() {
+    public List<AppointmentResponseDTO> getAllAppointments() {
         return appointmentRepository.findAll().stream().map(appointmentMapper::toDTO).toList();
     }
 
     @Override
-    public AppointmentDTO getAppointmentById(Long id) {
+    public AppointmentResponseDTO getAppointmentById(Long id) {
         return appointmentRepository.findById(id).map(appointmentMapper::toDTO)
                 .orElseThrow(() -> new AppointmentNotFoundException("Appointment not found with id: " + id));
     }
 
     @Override
-    public AppointmentDTO createAppointment(AppointmentDTO appointmentDTO) {
+    public AppointmentResponseDTO createAppointment(AppointmentRequestCreateDTO appointmentRequestCreateDTO) {
 
-        Patient patient = patientRepository.findById(appointmentDTO.patientId())
+        Patient patient = patientRepository.findById(appointmentRequestCreateDTO.patientId())
                 .orElseThrow(() -> new PatientNotFoundException("Patient not found with ID: "
-                        + appointmentDTO.patientId()));
+                        + appointmentRequestCreateDTO.patientId()));
 
-        Doctor doctor = doctorRepository.findById(appointmentDTO.doctorId())
+        Doctor doctor = doctorRepository.findById(appointmentRequestCreateDTO.doctorId())
                 .orElseThrow(() -> new DoctorNotFoundException("Doctor not found with ID: "
-                        + appointmentDTO.doctorId()));
+                        + appointmentRequestCreateDTO.doctorId()));
 
-        ConsultRoom consultRoom = consultRoomRepository.findById(appointmentDTO.consultRoomId())
+        ConsultRoom consultRoom = consultRoomRepository.findById(appointmentRequestCreateDTO.consultRoomId())
                 .orElseThrow(()-> new ConsultRoomNotFoundException("consult room not found with ID: "
-                        + appointmentDTO.consultRoomId()));
+                        + appointmentRequestCreateDTO.consultRoomId()));
 
         List<Appointment> doctorConflicts = appointmentRepository.
-                findConflictDoctor(appointmentDTO.doctorId(), appointmentDTO.startTime(), appointmentDTO.endTime());
+                findConflictDoctor(appointmentRequestCreateDTO.doctorId(), appointmentRequestCreateDTO.startTime(), appointmentRequestCreateDTO.endTime());
 
         List<Appointment> consultRoomConflicts = appointmentRepository.
-                findConflictConsultRoom(appointmentDTO.consultRoomId(), appointmentDTO.startTime(), appointmentDTO.endTime());
+                findConflictConsultRoom(appointmentRequestCreateDTO.consultRoomId(), appointmentRequestCreateDTO.startTime(), appointmentRequestCreateDTO.endTime());
 
         if (!doctorConflicts.isEmpty() && !consultRoomConflicts.isEmpty()) {
             throw new AppointmentConflictException("Doctor and consult room have an appointment at this time.");
@@ -69,48 +71,40 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new AppointmentConflictException("The consult room already has an appointment at this time.");
         }
 
-        if(doctor.getAvailableFrom().isAfter(appointmentDTO.startTime().toLocalTime()) || doctor.getAvailableTo().isBefore(appointmentDTO.endTime().toLocalTime())) {
+        if(doctor.getAvailableFrom().isAfter(appointmentRequestCreateDTO.startTime().toLocalTime()) || doctor.getAvailableTo().isBefore(appointmentRequestCreateDTO.endTime().toLocalTime())) {
             throw new DoctorScheduleConflictException("Doctor schedule conflict");
         }
 
-        Appointment appointment = appointmentMapper.toEntity(appointmentDTO);
+        Appointment appointment = appointmentMapper.toEntity(appointmentRequestCreateDTO);
         appointment.setPatient(patient);
         appointment.setDoctor(doctor);
         appointment.setConsultRoom(consultRoom);
+        appointment.setStatus(AppointmentStatus.SCHEDULED);
 
         return appointmentMapper.toDTO(appointmentRepository.save(appointment));
     }
 
     @Override
-    public AppointmentDTO updateAppointment(Long id, AppointmentDTO appointmentDTO) {
+    public AppointmentResponseDTO updateAppointment(Long id, AppointmentRequestUpdateDTO appointmentRequestUpdateDTO) {
         Appointment existing = appointmentRepository.findById(id)
-                .orElseThrow(()-> new AppointmentNotFoundException("Appointment not found with id: " + id));
+                .orElseThrow(() -> new AppointmentNotFoundException("Appointment not found with id: " + id));
 
-        if((existing.getStatus() != AppointmentStatus.SCHEDULED)) {
+        if ((existing.getStatus() != AppointmentStatus.SCHEDULED)) {
             throw new AppointmentNotModifiableException("Appointment not modifiable");
         }
 
-        Patient patient = patientRepository.findById(appointmentDTO.patientId())
-                .orElseThrow(() -> new PatientNotFoundException("Patient not found with ID: "
-                        + appointmentDTO.patientId()));
-
-        Doctor doctor = doctorRepository.findById(appointmentDTO.doctorId())
-                .orElseThrow(() -> new DoctorNotFoundException("Doctor not found with ID: "
-                        + appointmentDTO.doctorId()));
-
-        ConsultRoom consultRoom = consultRoomRepository.findById(appointmentDTO.consultRoomId())
-                .orElseThrow(()-> new ConsultRoomNotFoundException("consult room not found with ID: "
-                        + appointmentDTO.consultRoomId()));
+        Doctor doctor = existing.getDoctor();
+        ConsultRoom consultRoom = existing.getConsultRoom();
 
         List<Appointment> doctorConflicts = appointmentRepository.
-                findConflictDoctor(appointmentDTO.doctorId(), appointmentDTO.startTime(), appointmentDTO.endTime())
+                findConflictDoctor(doctor.getId(), appointmentRequestUpdateDTO.startTime(), appointmentRequestUpdateDTO.endTime())
                 .stream()
                 .filter(a -> !a.getId().equals(id))
                 .toList();
 
         List<Appointment> consultRoomConflicts = appointmentRepository.
                 findConflictConsultRoom
-                        (appointmentDTO.consultRoomId(), appointmentDTO.startTime(), appointmentDTO.endTime())
+                        (consultRoom.getId(), appointmentRequestUpdateDTO.startTime(), appointmentRequestUpdateDTO.endTime())
                 .stream()
                 .filter(a -> !a.getId().equals(id))
                 .toList();
@@ -123,18 +117,16 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new AppointmentConflictException("The consult room already has an appointment at this time.");
         }
 
-        LocalTime start = appointmentDTO.startTime().toLocalTime();
-        LocalTime end = appointmentDTO.endTime().toLocalTime();
+        LocalTime start = appointmentRequestUpdateDTO.startTime().toLocalTime();
+        LocalTime end = appointmentRequestUpdateDTO.endTime().toLocalTime();
+
         if (start.isBefore(doctor.getAvailableFrom()) || end.isAfter(doctor.getAvailableTo())) {
             throw new DoctorScheduleConflictException("Doctor schedule conflict");
         }
 
-        existing.setPatient(patient);
-        existing.setDoctor(doctor);
-        existing.setConsultRoom(consultRoom);
-        existing.setStartTime(appointmentDTO.startTime());
-        existing.setEndTime(appointmentDTO.endTime());
-        existing.setStatus(appointmentDTO.status());
+        existing.setStartTime(appointmentRequestUpdateDTO.startTime());
+        existing.setEndTime(appointmentRequestUpdateDTO.endTime());
+        existing.setStatus(appointmentRequestUpdateDTO.status());
 
         return appointmentMapper.toDTO(appointmentRepository.save(existing));
 
