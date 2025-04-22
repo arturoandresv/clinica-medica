@@ -24,6 +24,6 @@ public class ConsultRoom {
 
     private String description;
 
-    @OneToMany(mappedBy = "consult_room")
+    @OneToMany(mappedBy = "consultRoom")
     private Set<Appointment> appointments;
 }
