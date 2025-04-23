@@ -18,6 +18,7 @@ public class ConsultRoom {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
     private String name;
 
     private Integer floor;

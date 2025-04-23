@@ -2,6 +2,7 @@ package edu.unimagdalena.clinica.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
@@ -19,6 +20,7 @@ public class Doctor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
     private String fullName;
 
     @Email
@@ -26,8 +28,10 @@ public class Doctor {
 
     private String specialty;
 
+    @Future
     private LocalTime availableFrom;
 
+    @Future
     private LocalTime availableTo;
 
     @OneToMany(mappedBy = "doctor")

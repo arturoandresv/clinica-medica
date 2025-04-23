@@ -1,6 +1,7 @@
 package edu.unimagdalena.clinica.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Future;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -28,5 +29,6 @@ public class MedicalRecord {
 
     private String notes;
 
+    @Future
     private LocalDateTime createdAt;
 }
