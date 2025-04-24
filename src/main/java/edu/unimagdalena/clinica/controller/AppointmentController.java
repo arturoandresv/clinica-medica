@@ -42,9 +42,8 @@ public class AppointmentController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAppointment(@PathVariable Long id){
-        appointmentService.deleteAppointment(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<AppointmentResponseDTO> cancelAppointment(@PathVariable Long id) {
+        return ResponseEntity.ok(appointmentService.cancelAppointment(id));
     }
 
     @GetMapping(params = {"doctorId", "date"})
