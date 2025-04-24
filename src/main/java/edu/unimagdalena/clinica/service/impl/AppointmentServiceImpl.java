@@ -18,6 +18,7 @@ import edu.unimagdalena.clinica.service.AppointmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -72,6 +73,10 @@ public class AppointmentServiceImpl implements AppointmentService {
         } else if (!consultRoomConflicts.isEmpty()) {
             throw new AppointmentConflictException("The consult room already has an appointment at this time.");
         }
+        long duration = Duration.between(appointmentRequestCreateDTO.startTime(), appointmentRequestCreateDTO.endTime()).toMinutes();
+        if(duration < 30 || duration > 180) {
+            throw new AppointmentConflictException("The appointment duration is incorrect. (30-180 minutes)");
+        }
 
         if(doctor.getAvailableFrom().isAfter(appointmentRequestCreateDTO.startTime().toLocalTime()) || doctor.getAvailableTo().isBefore(appointmentRequestCreateDTO.endTime().toLocalTime())) {
             throw new DoctorScheduleConflictException("Doctor schedule conflict");
@@ -119,6 +124,11 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new AppointmentConflictException("The consult room already has an appointment at this time.");
         }
 
+        long duration = Duration.between(appointmentRequestUpdateDTO.startTime(), appointmentRequestUpdateDTO.endTime()).toMinutes();
+        if(duration < 30 || duration > 180) {
+            throw new AppointmentConflictException("The appointment duration is incorrect. (30-180 minutes)");
+        }
+
         LocalTime start = appointmentRequestUpdateDTO.startTime().toLocalTime();
         LocalTime end = appointmentRequestUpdateDTO.endTime().toLocalTime();
 
@@ -132,6 +142,19 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         return appointmentMapper.toDTO(appointmentRepository.save(existing));
 
+    }
+
+    @Override
+    public AppointmentResponseDTO cancelAppointment(Long id) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with id: " + id));
+
+        if (appointment.getStatus() == AppointmentStatus.COMPLETE) {
+            throw new IllegalStateException("Appointment is already completed");
+        }
+
+        appointment.setStatus(AppointmentStatus.CANCELED);
+        return appointmentMapper.toDTO(appointmentRepository.save(appointment));
     }
 
     @Override
