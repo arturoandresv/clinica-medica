@@ -2,9 +2,12 @@ package edu.unimagdalena.clinica.service;
 
 import edu.unimagdalena.clinica.dto.request.AppointmentRequestCreateDTO;
 import edu.unimagdalena.clinica.dto.request.AppointmentRequestUpdateDTO;
+import edu.unimagdalena.clinica.dto.request.PatientRequestDTO;
 import edu.unimagdalena.clinica.dto.response.AppointmentResponseDTO;
 import edu.unimagdalena.clinica.exception.AppointmentConflictException;
 import edu.unimagdalena.clinica.exception.DoctorScheduleConflictException;
+import edu.unimagdalena.clinica.exception.notfound.AppointmentNotFoundException;
+import edu.unimagdalena.clinica.exception.notfound.PatientNotFoundException;
 import edu.unimagdalena.clinica.mapper.AppointmentMapper;
 import edu.unimagdalena.clinica.model.*;
 import edu.unimagdalena.clinica.repository.AppointmentRepository;
@@ -227,4 +230,21 @@ class AppointmentServiceTest {
         assertThrows(DoctorScheduleConflictException.class, () ->
                 appointmentService.createAppointment(appointmentRequestCreateDTO));
     }
+
+    @Test
+    void shouldThrowIfAppointmentToDeleteNotFound() {
+        when(appointmentRepository.existsById(10L)).thenReturn(false);
+
+        assertThrows(AppointmentNotFoundException.class, () -> appointmentService.deleteAppointment(10L));
+    }
+
+    @Test
+    void shouldThrowIfAppointmentToUpdateNotFound() {
+        AppointmentRequestUpdateDTO appointmentRequestUpdateDTO = AppointmentRequestUpdateDTO.builder().build();
+        when(appointmentRepository.findById(10L)).thenReturn(Optional.empty());
+
+        assertThrows(AppointmentNotFoundException.class, () -> appointmentService.updateAppointment(10L, appointmentRequestUpdateDTO));
+    }
+
+
 }

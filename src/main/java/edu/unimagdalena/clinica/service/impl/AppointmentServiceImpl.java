@@ -18,6 +18,8 @@ import edu.unimagdalena.clinica.service.AppointmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -139,5 +141,22 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
 
         appointmentRepository.deleteById(id);
+    }
+
+    @Override
+    public List<AppointmentResponseDTO> findDoctorAppointmentsByDate(Long doctorId, LocalDate date) {
+        LocalDateTime startOfDay = date.atStartOfDay();
+        LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();
+
+        doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new DoctorNotFoundException("Doctor not found with id: " + doctorId));
+
+        List<Appointment> appointments = appointmentRepository.findDoctorAppointmentsByDate(doctorId, startOfDay, endOfDay);
+
+        if(appointments.isEmpty()) {
+            throw new AppointmentNotFoundException("No appointments found for doctor " + doctorId + " on " + date);
+        }
+
+        return appointments.stream().map(appointmentMapper::toDTO).toList();
     }
 }

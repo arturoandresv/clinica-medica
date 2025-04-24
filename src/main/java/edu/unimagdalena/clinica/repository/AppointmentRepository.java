@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,5 +25,9 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
                                          @Param("startTime") LocalDateTime startTime,
                                          @Param("endTime") LocalDateTime endTime);
 
-
+    @Query("SELECT a FROM Appointment a WHERE a.doctor.id = :doctorId " +
+            "AND ((a.startTime >= :startOfDay AND a.startTime < :endOfDay))")
+    List<Appointment> findDoctorAppointmentsByDate(@Param("doctorId") Long doctorId,
+                                                   @Param("startOfDay") LocalDateTime startOfDay,
+                                                   @Param("endOfDay") LocalDateTime endOfDay);
 }
