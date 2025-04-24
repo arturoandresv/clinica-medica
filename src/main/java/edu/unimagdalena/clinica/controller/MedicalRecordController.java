@@ -43,5 +43,4 @@ public class MedicalRecordController {
         return ResponseEntity.noContent().build();
     }
 
-
 }
