@@ -1,5 +1,6 @@
 package edu.unimagdalena.clinica.mapper;
 
+import edu.unimagdalena.clinica.dto.request.MedicalRecordRequestCreateDTO;
 import edu.unimagdalena.clinica.dto.response.MedicalRecordResponseDTO;
 import edu.unimagdalena.clinica.model.MedicalRecord;
 import org.mapstruct.Mapper;
@@ -14,5 +15,5 @@ public interface MedicalRecordMapper {
 
     @Mapping(target = "appointment", ignore = true)
     @Mapping(target = "patient", ignore = true)
-    MedicalRecord toEntity(MedicalRecordResponseDTO medicalRecordResponseDTO);
+    MedicalRecord toEntity(MedicalRecordRequestCreateDTO medicalRecordResponseDTO);
 }
