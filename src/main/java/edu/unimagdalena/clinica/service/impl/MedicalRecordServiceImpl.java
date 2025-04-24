@@ -1,9 +1,7 @@
 package edu.unimagdalena.clinica.service.impl;
 
-import edu.unimagdalena.clinica.dto.request.MedicalRecordRequestCreateDTO;
-import edu.unimagdalena.clinica.dto.request.MedicalRecordRequestUpdateDTO;
+import edu.unimagdalena.clinica.dto.request.MedicalRecordRequestDTO;
 import edu.unimagdalena.clinica.dto.response.MedicalRecordResponseDTO;
-import edu.unimagdalena.clinica.exception.ResourceNotFoundException;
 import edu.unimagdalena.clinica.exception.notfound.AppointmentNotFoundException;
 import edu.unimagdalena.clinica.exception.notfound.MedicalRecordNotFoundException;
 import edu.unimagdalena.clinica.exception.notfound.PatientNotFoundException;
@@ -44,7 +42,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
     }
 
     @Override
-    public MedicalRecordResponseDTO createMedicalRecord(MedicalRecordRequestCreateDTO dto) {
+    public MedicalRecordResponseDTO createMedicalRecord(MedicalRecordRequestDTO dto) {
         Patient patient = patientRepository.findById(dto.patientId())
                 .orElseThrow(() -> new PatientNotFoundException("Patient not found with id: " + dto.patientId()));
         Appointment appointment = appointmentRepository.findById(dto.appointmentId())
@@ -58,11 +56,6 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
         medicalRecord.setAppointment(appointment);
 
         return medicalRecordMapper.toDTO(medicalRecordRepository.save(medicalRecord));
-    }
-
-    @Override
-    public MedicalRecordResponseDTO updateMedicalRecord(Long id, MedicalRecordRequestUpdateDTO dto) {
-        return null;
     }
 
     @Override
