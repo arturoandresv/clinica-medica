@@ -4,6 +4,9 @@ import edu.unimagdalena.clinica.dto.request.MedicalRecordRequestCreateDTO;
 import edu.unimagdalena.clinica.dto.request.MedicalRecordRequestUpdateDTO;
 import edu.unimagdalena.clinica.dto.response.MedicalRecordResponseDTO;
 import edu.unimagdalena.clinica.exception.ResourceNotFoundException;
+import edu.unimagdalena.clinica.exception.notfound.AppointmentNotFoundException;
+import edu.unimagdalena.clinica.exception.notfound.MedicalRecordNotFoundException;
+import edu.unimagdalena.clinica.exception.notfound.PatientNotFoundException;
 import edu.unimagdalena.clinica.mapper.MedicalRecordMapper;
 import edu.unimagdalena.clinica.model.Appointment;
 import edu.unimagdalena.clinica.model.AppointmentStatus;
@@ -37,15 +40,15 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
     public MedicalRecordResponseDTO getMedicalRecordById(Long id) {
         return medicalRecordRepository.findById(id)
                 .map(medicalRecordMapper::toDTO)
-                .orElseThrow(() -> new ResourceNotFoundException("Medical Record not found with id: " + id));
+                .orElseThrow(() -> new MedicalRecordNotFoundException("Medical Record not found with id: " + id));
     }
 
     @Override
     public MedicalRecordResponseDTO createMedicalRecord(MedicalRecordRequestCreateDTO dto) {
         Patient patient = patientRepository.findById(dto.patientId())
-                .orElseThrow(() -> new ResourceNotFoundException("Patient not found with id: " + dto.patientId()));
+                .orElseThrow(() -> new PatientNotFoundException("Patient not found with id: " + dto.patientId()));
         Appointment appointment = appointmentRepository.findById(dto.appointmentId())
-                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with id: " + dto.appointmentId()));
+                .orElseThrow(() -> new AppointmentNotFoundException("Appointment not found with id: " + dto.appointmentId()));
 
         if(appointment.getStatus() != AppointmentStatus.COMPLETE){
             throw new IllegalStateException("Medical record can only be created with complete appointment");
@@ -65,7 +68,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
     @Override
     public void deleteMedicalRecord(Long id) {
         if(!medicalRecordRepository.existsById(id)){
-            throw new ResourceNotFoundException("Medical Record not found with id: " + id);
+            throw new MedicalRecordNotFoundException("Medical Record not found with id: " + id);
         }
         medicalRecordRepository.deleteById(id);
     }

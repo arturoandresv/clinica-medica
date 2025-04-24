@@ -15,5 +15,5 @@ public interface MedicalRecordMapper {
 
     @Mapping(target = "appointment", ignore = true)
     @Mapping(target = "patient", ignore = true)
-    MedicalRecord toEntity(MedicalRecordRequestCreateDTO medicalRecordResponseDTO);
+    MedicalRecord toEntity(MedicalRecordRequestCreateDTO medicalRecordRequestCreateDTO);
 }
