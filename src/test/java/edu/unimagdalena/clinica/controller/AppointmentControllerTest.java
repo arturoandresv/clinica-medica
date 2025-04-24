@@ -13,10 +13,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -112,5 +111,30 @@ class AppointmentControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(appointmentService).deleteAppointment(1L);
+    }
+
+    @Test
+    void shouldFindDoctorAppointmentsByDate() throws Exception {
+        LocalDateTime start = LocalDateTime.of(2025, 5, 2, 10, 0);
+        LocalDateTime end = start.plusMinutes(30);
+
+        AppointmentResponseDTO appointmentResponseDTO = AppointmentResponseDTO.builder()
+                .patientId(1L)
+                .doctorId(1L)
+                .consultRoomId(1L)
+                .startTime(start)
+                .endTime(end)
+                .build();
+
+        when(appointmentService.findDoctorAppointmentsByDate(eq(1L), eq(LocalDate.of(2025, 5, 2))))
+                .thenReturn(List.of(appointmentResponseDTO));
+
+        mockMvc.perform(get("/api/appointments?doctorId=1&date=2025-05-02"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].patientId").value(1L))
+                .andExpect(jsonPath("$[0].doctorId").value(1L))
+                .andExpect(jsonPath("$[0].consultRoomId").value(1L))
+                .andExpect(jsonPath("$[0].startTime").value("2025-05-02T10:00:00"))
+                .andExpect(jsonPath("$[0].endTime").value("2025-05-02T10:30:00"));
     }
 }

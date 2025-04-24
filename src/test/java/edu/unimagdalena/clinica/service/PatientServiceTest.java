@@ -136,7 +136,7 @@ class PatientServiceTest {
 
         when(patientRepository.findById(1L)).thenReturn(Optional.of(existing));
         when(patientRepository.save(any())).thenReturn(existing);
-        when(patientMapper.toDto(any())).thenReturn(update);
+        when(patientMapper.toDto(existing)).thenReturn(update);
 
         PatientResponseDTO result = patientService.updatePatient(1L, requestUpdate);
 

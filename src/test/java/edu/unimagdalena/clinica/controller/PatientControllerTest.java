@@ -1,7 +1,6 @@
 package edu.unimagdalena.clinica.controller;
 
 import edu.unimagdalena.clinica.dto.response.PatientResponseDTO;
-import edu.unimagdalena.clinica.model.Patient;
 import edu.unimagdalena.clinica.service.PatientService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -12,8 +11,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import javax.print.attribute.standard.Media;
 
 import java.util.List;
 
