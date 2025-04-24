@@ -2,6 +2,7 @@ package edu.unimagdalena.clinica.service.impl;
 
 import edu.unimagdalena.clinica.dto.request.MedicalRecordRequestDTO;
 import edu.unimagdalena.clinica.dto.response.MedicalRecordResponseDTO;
+import edu.unimagdalena.clinica.exception.AppointmentNotModifiableException;
 import edu.unimagdalena.clinica.exception.notfound.AppointmentNotFoundException;
 import edu.unimagdalena.clinica.exception.notfound.MedicalRecordNotFoundException;
 import edu.unimagdalena.clinica.exception.notfound.PatientNotFoundException;
@@ -48,8 +49,8 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
         Appointment appointment = appointmentRepository.findById(dto.appointmentId())
                 .orElseThrow(() -> new AppointmentNotFoundException("Appointment not found with id: " + dto.appointmentId()));
 
-        if(appointment.getStatus() != AppointmentStatus.COMPLETE){
-            throw new IllegalStateException("Medical record can only be created with complete appointment");
+        if(appointment.getStatus() != AppointmentStatus.COMPLETED){
+            throw new AppointmentNotModifiableException("Medical record can only be created with complete appointment");
         }
         MedicalRecord medicalRecord = medicalRecordMapper.toEntity(dto);
         medicalRecord.setPatient(patient);
