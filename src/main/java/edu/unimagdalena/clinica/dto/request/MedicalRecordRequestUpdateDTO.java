@@ -1,8 +1,8 @@
 package edu.unimagdalena.clinica.dto.request;
 
-import java.time.LocalDateTime;
+import lombok.Builder;
 
+@Builder
 public record MedicalRecordRequestUpdateDTO(String diagnosis,
-                                            String notes,
-                                            LocalDateTime createdAt) {
+                                            String notes) {
 }
