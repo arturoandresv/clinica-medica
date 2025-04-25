@@ -114,6 +114,7 @@ class AppointmentServiceTest {
         assertEquals(1L, result.patientId());
         assertEquals(1L, result.doctorId());
         assertEquals(1L, result.consultRoomId());
+        verify(appointmentRepository).save(appointment);
     }
 
     @Test
@@ -170,12 +171,30 @@ class AppointmentServiceTest {
     }
 
     @Test
-    void shouldDeleteAppointment() {
-        when(appointmentRepository.existsById(1L)).thenReturn(true);
+    void shouldCancelAppointment() {
+        Appointment appointment = Appointment.builder()
+                .id(1L)
+                .status(AppointmentStatus.SCHEDULED)
+                .build();
 
-        appointmentService.deleteAppointment(1L);
+        Appointment updatedAppointment = Appointment.builder()
+                .id(1L)
+                .status(AppointmentStatus.CANCELED)
+                .build();
 
-        verify(appointmentRepository).deleteById(1L);
+        AppointmentResponseDTO appointmentResponseDTO = AppointmentResponseDTO.builder()
+                .status(AppointmentStatus.CANCELED)
+                .build();
+
+        when(appointmentRepository.findById(1L)).thenReturn(Optional.of(appointment));
+        when(appointmentRepository.save(any(Appointment.class))).thenReturn(updatedAppointment);
+        when(appointmentMapper.toDTO(updatedAppointment)).thenReturn(appointmentResponseDTO);
+
+        AppointmentResponseDTO result = appointmentService.cancelAppointment(1L);
+
+        assertNotNull(result);
+        assertEquals(AppointmentStatus.CANCELED, result.status());
+        verify(appointmentRepository).save(appointment);
     }
 
     @Test
@@ -229,13 +248,6 @@ class AppointmentServiceTest {
 
         assertThrows(DoctorScheduleConflictException.class, () ->
                 appointmentService.createAppointment(appointmentRequestCreateDTO));
-    }
-
-    @Test
-    void shouldThrowIfAppointmentToDeleteNotFound() {
-        when(appointmentRepository.existsById(10L)).thenReturn(false);
-
-        assertThrows(AppointmentNotFoundException.class, () -> appointmentService.deleteAppointment(10L));
     }
 
     @Test

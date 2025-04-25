@@ -50,7 +50,9 @@ class DoctorControllerTest {
 
     @Test
     void shouldGetAllDoctors() throws Exception {
-        when(doctorService.getAllDoctors()).thenReturn(List.of(createDoctorResponseDTO()));
+        DoctorResponseDTO doctorResponseDTO = createDoctorResponseDTO();
+
+        when(doctorService.getAllDoctors()).thenReturn(List.of(doctorResponseDTO));
 
         mockMvc.perform(get("/api/doctors"))
                 .andExpect(status().isOk())

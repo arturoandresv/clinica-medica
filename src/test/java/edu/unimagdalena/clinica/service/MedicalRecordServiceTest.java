@@ -100,7 +100,7 @@ class MedicalRecordServiceTest {
         List<MedicalRecordResponseDTO> result = medicalRecordService.getAllMedicalRecords();
 
         assertEquals(1, result.size());
-        assertEquals("Historial 1", result.get(0).diagnosis());
+        assertEquals("Historial 1", result.getFirst().diagnosis());
     }
 
     @Test
@@ -127,7 +127,7 @@ class MedicalRecordServiceTest {
         List<MedicalRecordResponseDTO> result = medicalRecordService.getMedicalRecordsByPatientId(1L);
 
         assertEquals(1, result.size());
-        assertEquals("Control general", result.get(0).notes());
+        assertEquals("Control general", result.getFirst().notes());
     }
 
     @Test

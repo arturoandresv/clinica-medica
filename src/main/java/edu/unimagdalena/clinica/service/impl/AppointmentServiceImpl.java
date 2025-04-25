@@ -48,14 +48,6 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public AppointmentResponseDTO createAppointment(AppointmentRequestCreateDTO appointmentRequestCreateDTO) {
 
-        if (appointmentRequestCreateDTO.startTime().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("No se puede agendar una cita en el pasado.");
-        }
-
-        if (appointmentRequestCreateDTO.endTime().isBefore(appointmentRequestCreateDTO.startTime())) {
-            throw new IllegalArgumentException("La hora de finalización debe ser posterior a la hora de inicio.");
-        }
-
         Patient patient = patientRepository.findById(appointmentRequestCreateDTO.patientId())
                 .orElseThrow(() -> new PatientNotFoundException("Patient not found with ID: "
                         + appointmentRequestCreateDTO.patientId()));
@@ -101,13 +93,6 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     public AppointmentResponseDTO updateAppointment(Long id, AppointmentRequestUpdateDTO appointmentRequestUpdateDTO) {
-        if (appointmentRequestUpdateDTO.startTime().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("No se puede reprogramar una cita hacia el pasado.");
-        }
-
-        if (appointmentRequestUpdateDTO.endTime().isBefore(appointmentRequestUpdateDTO.startTime())) {
-            throw new IllegalArgumentException("La hora de finalización debe ser posterior a la hora de inicio.");
-        }
         Appointment existing = appointmentRepository.findById(id)
                 .orElseThrow(() -> new AppointmentNotFoundException("Appointment not found with id: " + id));
 
@@ -159,10 +144,11 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     }
 
+
     @Override
     public AppointmentResponseDTO cancelAppointment(Long id) {
         Appointment appointment = appointmentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with id: " + id));
+                .orElseThrow(() -> new AppointmentNotFoundException("Appointment not found with id: " + id));
 
         if (appointment.getStatus() == AppointmentStatus.COMPLETED) {
             throw new IllegalStateException("Appointment is already completed");
@@ -170,15 +156,6 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         appointment.setStatus(AppointmentStatus.CANCELED);
         return appointmentMapper.toDTO(appointmentRepository.save(appointment));
-    }
-
-    @Override
-    public void deleteAppointment(Long id) {
-        if(!appointmentRepository.existsById(id)) {
-            throw new AppointmentNotFoundException("Appointment not found with id: " + id);
-        }
-
-        appointmentRepository.deleteById(id);
     }
 
     @Override
