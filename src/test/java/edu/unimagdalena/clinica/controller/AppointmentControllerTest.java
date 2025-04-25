@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -106,11 +107,24 @@ class AppointmentControllerTest {
     }
 
     @Test
-    void shouldDeleteAppointment() throws Exception {
-        mockMvc.perform(delete("/api/appointments/1"))
-                .andExpect(status().isNoContent());
+    void shouldCancelAppointment() throws Exception {
+        AppointmentResponseDTO appointmentResponseDTO = AppointmentResponseDTO.builder()
+                .id(1L)
+                .patientId(1L)
+                .doctorId(1L)
+                .consultRoomId(1L)
+                .startTime(LocalDateTime.now().plusHours(7))
+                .endTime(LocalDateTime.now().plusDays(7).plusHours(1))
+                .status(AppointmentStatus.CANCELED)
+                .build();
 
-        verify(appointmentService).deleteAppointment(1L);
+        when(appointmentService.cancelAppointment(any())).thenReturn(appointmentResponseDTO);
+
+        mockMvc.perform(delete("/api/appointments/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("CANCELED"));
+
+        verify(appointmentService).cancelAppointment(1L);
     }
 
     @Test

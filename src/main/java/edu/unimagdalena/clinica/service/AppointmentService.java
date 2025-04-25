@@ -13,6 +13,5 @@ public interface AppointmentService {
     AppointmentResponseDTO createAppointment(AppointmentRequestCreateDTO appointmentRequestCreateDTO);
     AppointmentResponseDTO updateAppointment(Long id, AppointmentRequestUpdateDTO appointmentRequestUpdateDTO);
     AppointmentResponseDTO cancelAppointment(Long id);
-    void deleteAppointment(Long id);
     List<AppointmentResponseDTO> findDoctorAppointmentsByDate(Long doctorId, LocalDate date);
 }

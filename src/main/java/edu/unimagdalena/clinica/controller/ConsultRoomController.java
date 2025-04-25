@@ -21,7 +21,7 @@ public class ConsultRoomController {
 
     @GetMapping
     public ResponseEntity<List<ConsultRoomResponseDTO>> getAllConsultRooms() {
-        return ResponseEntity.ok(consultRoomService.getConsultRooms());
+        return ResponseEntity.ok(consultRoomService.getAllConsultRooms());
     }
 
     @GetMapping("/{id}")

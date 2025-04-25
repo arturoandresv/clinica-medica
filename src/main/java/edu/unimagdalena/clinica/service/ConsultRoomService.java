@@ -6,10 +6,9 @@ import edu.unimagdalena.clinica.dto.response.ConsultRoomResponseDTO;
 import java.util.List;
 
 public interface ConsultRoomService {
-    List<ConsultRoomResponseDTO> getConsultRooms();
+    List<ConsultRoomResponseDTO> getAllConsultRooms();
     ConsultRoomResponseDTO getConsultRoomById(Long id);
     ConsultRoomResponseDTO createConsultRoom(ConsultRoomRequestDTO consultRoomRequestDTO);
     ConsultRoomResponseDTO updateConsultRoom(Long id, ConsultRoomRequestDTO dto);
-
     void deleteConsultRoom(Long id);
 }

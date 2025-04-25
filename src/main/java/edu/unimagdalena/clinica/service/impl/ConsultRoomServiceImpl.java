@@ -20,7 +20,7 @@ public class ConsultRoomServiceImpl implements ConsultRoomService {
 
 
     @Override
-    public List<ConsultRoomResponseDTO> getConsultRooms() {
+    public List<ConsultRoomResponseDTO> getAllConsultRooms() {
         return consultRoomRepository.findAll()
                 .stream()
                 .map(consultRoomMapper::toDto).toList();
