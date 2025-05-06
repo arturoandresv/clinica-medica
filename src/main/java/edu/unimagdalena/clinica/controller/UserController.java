@@ -1,14 +1,13 @@
 package edu.unimagdalena.clinica.controller;
 
-import edu.unimagdalena.clinica.dto.AuthRequest;
-import edu.unimagdalena.clinica.dto.MessageResponse;
-import edu.unimagdalena.clinica.dto.SignUpRequest;
+import edu.unimagdalena.clinica.dto.request.AuthRequest;
+import edu.unimagdalena.clinica.dto.response.MessageResponse;
+import edu.unimagdalena.clinica.dto.request.SignUpRequest;
 import edu.unimagdalena.clinica.model.Role;
 import edu.unimagdalena.clinica.model.User;
 import edu.unimagdalena.clinica.repository.RoleRepository;
 import edu.unimagdalena.clinica.repository.UserRepository;
 import edu.unimagdalena.clinica.security.jwt.JwtUtil;
-import edu.unimagdalena.clinica.security.service.JpaUserDetailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -35,7 +34,7 @@ public class UserController {
     private final RoleRepository roleRepository;
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(AuthRequest authRequest) {
+    public ResponseEntity<?> authenticateUser(@RequestBody AuthRequest authRequest) {
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken
                         (authRequest.username(), authRequest.password()));

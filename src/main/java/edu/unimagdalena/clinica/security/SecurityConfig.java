@@ -1,6 +1,5 @@
 package edu.unimagdalena.clinica.security;
 
-import edu.unimagdalena.clinica.repository.UserRepository;
 import edu.unimagdalena.clinica.security.jwt.JwtEntryPoint;
 import edu.unimagdalena.clinica.security.jwt.JwtFilter;
 import edu.unimagdalena.clinica.security.service.JpaUserDetailService;
@@ -15,7 +14,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -27,9 +25,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    JpaUserDetailService userDetailsService;
-
-    private JwtEntryPoint unauthorizedHandler;
+    private final JpaUserDetailService userDetailsService;
+    private final JwtEntryPoint unauthorizedHandler;
 
     @Bean
     public AuthenticationManager getAuthenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -45,7 +42,7 @@ public class SecurityConfig {
                 .exceptionHandling(ex->ex.authenticationEntryPoint(unauthorizedHandler))
                 .authorizeHttpRequests
                         (auth->auth
-                                .requestMatchers("/api/auth").permitAll()
+                                .requestMatchers("/api/auth/**").permitAll()
                                 .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

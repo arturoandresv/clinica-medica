@@ -1,4 +1,4 @@
-package edu.unimagdalena.clinica.dto;
+package edu.unimagdalena.clinica.dto.request;
 
 import java.util.Set;
 
