@@ -2,7 +2,6 @@ package edu.unimagdalena.clinica.security.jwt;
 
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -12,12 +11,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
-public class JwtUtil {
+public class JwtService {
     private final SecretKey key;
     private final long expiration;
 
-    public JwtUtil(@Value("${jwt.secretKey}") String secretKey,
-                   @Value("${jwt.expiration}") long expiration) {
+    public JwtService(@Value("${jwt.secretKey}") String secretKey,
+                      @Value("${jwt.expiration}") long expiration) {
         this.key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
         this.expiration = expiration;
     }
