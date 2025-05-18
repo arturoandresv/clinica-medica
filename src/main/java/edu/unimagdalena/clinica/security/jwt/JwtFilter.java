@@ -1,5 +1,6 @@
 package edu.unimagdalena.clinica.security.jwt;
 
+import edu.unimagdalena.clinica.security.service.UserInfoService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,8 +21,8 @@ import java.io.IOException;
 @Component
 @AllArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
-    private JwtUtil jwtUtil;
-    private UserDetailsService userDetailsService;
+    private JwtService jwtService;
+    private UserInfoService userDetailsService;
 
     private static final Logger logger = LoggerFactory.getLogger(JwtFilter.class);
 
@@ -31,10 +32,10 @@ public class JwtFilter extends OncePerRequestFilter {
             String authHeader = request.getHeader("Authorization");
             if(authHeader !=null && authHeader.startsWith("Bearer ")) {
                 String jwtToken = authHeader.substring(7);
-                String username = jwtUtil.extractUsername(jwtToken);
+                String username = jwtService.extractUsername(jwtToken);
                 if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                    if (jwtUtil.isTokenValid(jwtToken)) {
+                    if (jwtService.isTokenValid(jwtToken)) {
                         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                         SecurityContextHolder.getContext().setAuthentication(authentication);

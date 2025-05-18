@@ -2,10 +2,11 @@ package edu.unimagdalena.clinica.security;
 
 import edu.unimagdalena.clinica.security.jwt.JwtEntryPoint;
 import edu.unimagdalena.clinica.security.jwt.JwtFilter;
-import edu.unimagdalena.clinica.security.service.JpaUserDetailService;
+import edu.unimagdalena.clinica.security.service.UserInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -25,7 +26,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JpaUserDetailService userDetailsService;
     private final JwtEntryPoint unauthorizedHandler;
 
     @Bean
@@ -34,7 +34,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter jwtFilter, UserInfoService userInfoService) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement
@@ -43,17 +43,22 @@ public class SecurityConfig {
                 .authorizeHttpRequests
                         (auth->auth
                                 .requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers("/api/patients/**").permitAll()
+                                .requestMatchers("/api/appointments/**").permitAll()
+                                .requestMatchers("/api/doctors/**").permitAll()
+                                .requestMatchers("/api/records/**").permitAll()
+                                .requestMatchers("/api/rooms/**").permitAll()
                                 .anyRequest().authenticated())
-                .authenticationProvider(authenticationProvider())
+                .authenticationProvider(authenticationProvider(userInfoService))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider(){
+    public AuthenticationProvider authenticationProvider(UserInfoService userInfoService) throws Exception {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
 
-        authenticationProvider.setUserDetailsService(userDetailsService);
+        authenticationProvider.setUserDetailsService(userInfoService);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
 
         return authenticationProvider;
