@@ -1,6 +1,7 @@
 package edu.unimagdalena.clinica.security.service;
 
 import edu.unimagdalena.clinica.dto.request.SignUpRequest;
+import edu.unimagdalena.clinica.exception.notfound.RoleNotFoundException;
 import edu.unimagdalena.clinica.model.Role;
 import edu.unimagdalena.clinica.model.User;
 import edu.unimagdalena.clinica.repository.RoleRepository;
@@ -48,21 +49,21 @@ public class UserInfoService implements UserDetailsService {
 
         if (strRoles == null) {
             Role userRole = roleRepository.findByName("ROLE_USER")
-                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                    .orElseThrow(() -> new RoleNotFoundException("Error: Role is not found."));
             roles.add(userRole);
         } else {
             strRoles.forEach(role -> {
                 switch (role) {
                     case "admin":
                         Role adminRole = roleRepository.findByName(("ROLE_ADMIN"))
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                                .orElseThrow(() -> new RoleNotFoundException("Error: Role is not found."));
                         roles.add(adminRole);
 
                         break;
 
                     default:
                         Role userRole = roleRepository.findByName("ROLE_USER")
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                                .orElseThrow(() -> new RoleNotFoundException("Error: Role is not found."));
                         roles.add(userRole);
                 }
             });
