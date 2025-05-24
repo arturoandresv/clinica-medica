@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalTime;
@@ -24,14 +25,16 @@ public class Doctor {
     private String fullName;
 
     @Email
+    @NotBlank
     private String email;
 
+    @NotBlank
     private String specialty;
 
-    @Future
+    @NotNull
     private LocalTime availableFrom;
 
-    @Future
+    @NotNull
     private LocalTime availableTo;
 
     @OneToMany(mappedBy = "doctor")

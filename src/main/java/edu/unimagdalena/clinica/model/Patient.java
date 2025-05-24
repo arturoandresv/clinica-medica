@@ -22,8 +22,10 @@ public class Patient {
     private String fullName;
 
     @Email
+    @NotBlank
     private String email;
 
+    @NotBlank
     private String phone;
 
     @OneToMany(mappedBy = "patient")
