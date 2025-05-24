@@ -48,21 +48,21 @@ public class UserInfoService implements UserDetailsService {
         Set<Role> roles = new HashSet<>();
 
         if (strRoles == null) {
-            Role userRole = roleRepository.findByName("ROLE_USER")
+            Role userRole = roleRepository.findByName("USER")
                     .orElseThrow(() -> new RoleNotFoundException("Error: Role is not found."));
             roles.add(userRole);
         } else {
             strRoles.forEach(role -> {
                 switch (role) {
                     case "admin":
-                        Role adminRole = roleRepository.findByName(("ROLE_ADMIN"))
+                        Role adminRole = roleRepository.findByName("ADMIN")
                                 .orElseThrow(() -> new RoleNotFoundException("Error: Role is not found."));
                         roles.add(adminRole);
 
                         break;
 
                     default:
-                        Role userRole = roleRepository.findByName("ROLE_USER")
+                        Role userRole = roleRepository.findByName("USER")
                                 .orElseThrow(() -> new RoleNotFoundException("Error: Role is not found."));
                         roles.add(userRole);
                 }
