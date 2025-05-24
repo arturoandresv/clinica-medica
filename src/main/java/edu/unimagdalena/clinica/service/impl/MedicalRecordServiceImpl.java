@@ -15,6 +15,7 @@ import edu.unimagdalena.clinica.repository.AppointmentRepository;
 import edu.unimagdalena.clinica.repository.MedicalRecordRepository;
 import edu.unimagdalena.clinica.repository.PatientRepository;
 import edu.unimagdalena.clinica.service.MedicalRecordService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -60,11 +61,17 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
     }
 
     @Override
+    @Transactional
     public void deleteMedicalRecord(Long id) {
-        if(!medicalRecordRepository.existsById(id)){
-            throw new MedicalRecordNotFoundException("Medical Record not found with id: " + id);
+        MedicalRecord record = medicalRecordRepository.findById(id)
+                .orElseThrow(() -> new MedicalRecordNotFoundException("Medical Record not found with id: " + id));
+
+        Appointment appointment = record.getAppointment();
+        if (appointment != null) {
+            appointment.setMedicalRecord(null);
         }
-        medicalRecordRepository.deleteById(id);
+
+        medicalRecordRepository.delete(record);
     }
 
     @Override

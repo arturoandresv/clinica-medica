@@ -2,6 +2,7 @@ package edu.unimagdalena.clinica.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -25,8 +26,10 @@ public class MedicalRecord {
     @JoinColumn(name = "patient_id", referencedColumnName = "id")
     private Patient patient;
 
+    @NotBlank
     private String diagnosis;
 
+    @NotBlank
     private String notes;
 
     @Future
