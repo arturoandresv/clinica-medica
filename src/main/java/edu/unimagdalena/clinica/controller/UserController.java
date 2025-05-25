@@ -1,8 +1,10 @@
 package edu.unimagdalena.clinica.controller;
 
 import edu.unimagdalena.clinica.dto.request.AuthRequest;
+import edu.unimagdalena.clinica.dto.request.PasswordResetRequestDTO;
 import edu.unimagdalena.clinica.dto.request.SignUpRequest;
 import edu.unimagdalena.clinica.dto.response.LoginResponseDTO;
+import edu.unimagdalena.clinica.exception.ResourceNotFoundException;
 import edu.unimagdalena.clinica.exception.alreadyexists.EmailAlreadyExistsException;
 import edu.unimagdalena.clinica.exception.alreadyexists.UsernameAlreadyExistsException;
 import edu.unimagdalena.clinica.model.Role;
@@ -17,6 +19,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,6 +35,7 @@ public class UserController {
     private final AuthenticationManager authenticationManager;
     private final UserInfoService userInfoService;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody AuthRequest authRequest) {
@@ -62,4 +66,16 @@ public class UserController {
         SignUpRequest response =  userInfoService.addUser(signUpRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody PasswordResetRequestDTO request) {
+        User user = userRepository.findByUsername(request.email())
+                .orElseThrow(() -> new ResourceNotFoundException("No existe una cuenta con ese correo"));
+
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
+
+        return ResponseEntity.ok("Contraseña actualizada correctamente");
+    }
+
 }

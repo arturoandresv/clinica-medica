@@ -1,6 +1,7 @@
 package edu.unimagdalena.clinica.controller;
 
 import edu.unimagdalena.clinica.dto.request.DoctorRequestDTO;
+import edu.unimagdalena.clinica.dto.request.DoctorWithUserDTO;
 import edu.unimagdalena.clinica.dto.response.DoctorResponseDTO;
 import edu.unimagdalena.clinica.service.DoctorService;
 import jakarta.validation.Valid;
@@ -54,5 +55,11 @@ public class DoctorController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<List<DoctorResponseDTO>> findBySpecialty(@RequestParam String specialty) {
         return ResponseEntity.ok(doctorService.findBySpecialty(specialty));
+    }
+
+    @PostMapping("/register-with-user")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<DoctorResponseDTO> registerDoctorWithUser(@Valid @RequestBody DoctorWithUserDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(doctorService.registerDoctorWithUser(dto));
     }
 }

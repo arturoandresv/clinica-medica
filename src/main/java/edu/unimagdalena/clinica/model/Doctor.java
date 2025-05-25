@@ -39,4 +39,9 @@ public class Doctor {
 
     @OneToMany(mappedBy = "doctor")
     private Set<Appointment> appointments;
+
+    @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
+
 }
