@@ -1,6 +1,7 @@
 package edu.unimagdalena.clinica.service;
 
 import edu.unimagdalena.clinica.dto.request.DoctorRequestDTO;
+import edu.unimagdalena.clinica.dto.request.DoctorWithUserDTO;
 import edu.unimagdalena.clinica.dto.response.DoctorResponseDTO;
 
 import java.util.List;
@@ -12,4 +13,5 @@ public interface DoctorService {
     DoctorResponseDTO updateDoctor(Long id, DoctorRequestDTO doctorRequestDTO);
     void deleteDoctor(Long id);
     List<DoctorResponseDTO> findBySpecialty(String specialty);
+    DoctorResponseDTO registerDoctorWithUser(DoctorWithUserDTO doctorRequestDTO);
 }
