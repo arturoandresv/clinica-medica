@@ -34,8 +34,6 @@ public class UserController {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final UserInfoService userInfoService;
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody AuthRequest authRequest) {
@@ -44,11 +42,7 @@ public class UserController {
                         (authRequest.username(), authRequest.password()));
         if(authentication.isAuthenticated()) {
             String token = jwtService.generateToken(authRequest.username());
-            User user = userRepository.findByUsername(authRequest.username()).orElseThrow();
-            List<String> roles = user.getRoles().stream()
-                    .map(role -> "ROLE_" + role.getName().toUpperCase())
-                    .toList();
-            return ResponseEntity.ok(new LoginResponseDTO(token, roles));
+            return ResponseEntity.ok(new LoginResponseDTO(token, userInfoService.getUserRoles(authRequest.username())));
         } else {
             throw new UsernameNotFoundException("Invalid user request");
         }
@@ -56,25 +50,12 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody SignUpRequest signUpRequest) {
-        if (userInfoService.existsByUsername(signUpRequest.username())) {
-            throw new UsernameAlreadyExistsException("Username is already taken");
-        }
-        if(userInfoService.existsByEmail(signUpRequest.email())) {
-            throw new EmailAlreadyExistsException("Email is already taken");
-        }
-
-        SignUpRequest response =  userInfoService.addUser(signUpRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userInfoService.addUser(signUpRequest));
     }
 
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody PasswordResetRequestDTO request) {
-        User user = userRepository.findByUsername(request.email())
-                .orElseThrow(() -> new ResourceNotFoundException("No existe una cuenta con ese correo"));
-
-        user.setPassword(passwordEncoder.encode(request.newPassword()));
-        userRepository.save(user);
-
+        userInfoService.resetPassword(request);
         return ResponseEntity.ok("Contraseña actualizada correctamente");
     }
 
