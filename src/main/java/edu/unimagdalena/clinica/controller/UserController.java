@@ -42,7 +42,9 @@ public class UserController {
                         (authRequest.username(), authRequest.password()));
         if(authentication.isAuthenticated()) {
             String token = jwtService.generateToken(authRequest.username());
-            return ResponseEntity.ok(new LoginResponseDTO(token, userInfoService.getUserRoles(authRequest.username())));
+            List<String> roles = userInfoService.getUserRoles(authRequest.username());
+            Long doctorId = userInfoService.getDoctorIdByUsername(authRequest.username());
+            return ResponseEntity.ok(new LoginResponseDTO(token, roles, doctorId));
         } else {
             throw new UsernameNotFoundException("Invalid user request");
         }

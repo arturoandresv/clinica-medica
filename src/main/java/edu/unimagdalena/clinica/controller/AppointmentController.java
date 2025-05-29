@@ -22,7 +22,7 @@ public class AppointmentController {
     private final AppointmentService appointmentService;
 
     @GetMapping
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<AppointmentResponseDTO>> getAllAppointments(){
         return ResponseEntity.ok(appointmentService.getAllAppointments());
     }
@@ -57,4 +57,11 @@ public class AppointmentController {
     public ResponseEntity<List<AppointmentResponseDTO>> findDoctorAppointmentsByDate(@RequestParam Long doctorId, @RequestParam LocalDate date){
         return ResponseEntity.ok(appointmentService.findDoctorAppointmentsByDate(doctorId, date));
     }
+
+    @GetMapping("/doctor/{doctorId}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<List<AppointmentResponseDTO>> getAppointmentsByDoctor(@PathVariable Long doctorId) {
+        return ResponseEntity.ok(appointmentService.findAppointmentsByDoctorId(doctorId));
+    }
+
 }

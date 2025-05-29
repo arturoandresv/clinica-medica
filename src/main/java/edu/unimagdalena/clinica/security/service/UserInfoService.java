@@ -6,8 +6,10 @@ import edu.unimagdalena.clinica.exception.ResourceNotFoundException;
 import edu.unimagdalena.clinica.exception.alreadyexists.EmailAlreadyExistsException;
 import edu.unimagdalena.clinica.exception.alreadyexists.UsernameAlreadyExistsException;
 import edu.unimagdalena.clinica.exception.notfound.RoleNotFoundException;
+import edu.unimagdalena.clinica.model.Doctor;
 import edu.unimagdalena.clinica.model.Role;
 import edu.unimagdalena.clinica.model.User;
+import edu.unimagdalena.clinica.repository.DoctorRepository;
 import edu.unimagdalena.clinica.repository.RoleRepository;
 import edu.unimagdalena.clinica.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -27,7 +29,7 @@ public class UserInfoService implements UserDetailsService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder encoder;
-
+    private final DoctorRepository doctorRepository;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
@@ -94,4 +96,16 @@ public class UserInfoService implements UserDetailsService {
 
         return new SignUpRequest(user.getUsername(), user.getEmail(), userInfo.password(), userInfo.roles());
     }
+
+    public Long getDoctorIdByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        return doctorRepository.findAll().stream()
+                .filter(doctor -> doctor.getUser().getId().equals(user.getId()))
+                .map(Doctor::getId)
+                .findFirst()
+                .orElse(null);
+    }
+
 }

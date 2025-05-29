@@ -174,4 +174,20 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         return appointments.stream().map(appointmentMapper::toDTO).toList();
     }
+
+    @Override
+    public List<AppointmentResponseDTO> findAppointmentsByDoctorId(Long doctorId) {
+        doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new DoctorNotFoundException("Doctor not found with id: " + doctorId));
+
+        List<Appointment> appointments = appointmentRepository.findByDoctorId(doctorId);
+
+        if (appointments.isEmpty()) {
+            throw new AppointmentNotFoundException("No appointments found for doctor with id: " + doctorId);
+        }
+
+        return appointments.stream()
+                .map(appointmentMapper::toDTO)
+                .toList();
+    }
 }
