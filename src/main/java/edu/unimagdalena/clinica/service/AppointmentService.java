@@ -14,4 +14,5 @@ public interface AppointmentService {
     AppointmentResponseDTO updateAppointment(Long id, AppointmentRequestUpdateDTO appointmentRequestUpdateDTO);
     AppointmentResponseDTO cancelAppointment(Long id);
     List<AppointmentResponseDTO> findDoctorAppointmentsByDate(Long doctorId, LocalDate date);
+    List<AppointmentResponseDTO> findAppointmentsByDoctorId(Long doctorId);
 }

@@ -10,8 +10,11 @@ import org.mapstruct.Mapping;
 public interface AppointmentMapper {
 
     @Mapping(source = "patient.id", target = "patientId")
+    @Mapping(source = "patient.fullName", target = "patientFullName")
     @Mapping(source = "doctor.id", target = "doctorId")
+    @Mapping(source = "doctor.fullName", target = "doctorFullName")
     @Mapping(source = "consultRoom.id", target = "consultRoomId")
+    @Mapping(source = "consultRoom.name", target = "consultRoomName")
     AppointmentResponseDTO toDTO(Appointment appointment);
 
     @Mapping(target = "patient", ignore = true)
