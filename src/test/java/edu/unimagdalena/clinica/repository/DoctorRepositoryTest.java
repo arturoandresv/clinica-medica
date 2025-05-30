@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Import;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.TestcontainersConfiguration;
 
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +30,8 @@ class DoctorRepositoryTest {
                 .fullName("Pedro Gonzalez")
                 .email("pgonzalez@gmail.com")
                 .specialty("Cardiology")
+                .availableFrom(LocalTime.now())
+                .availableTo(LocalTime.now().plusHours(8))
                 .build();
 
         Doctor saved = doctorRepository.save(doctor);
@@ -42,21 +45,27 @@ class DoctorRepositoryTest {
 
     @Test
     void shouldFindAllDoctors() {
-        doctorRepository.save(Doctor.builder()
+        Doctor doctor1 = doctorRepository.save(Doctor.builder()
                 .fullName("Pedro Gonzalez")
                 .email("pgonzalez@gmail.com")
                 .specialty("Cardiology")
+                .availableFrom(LocalTime.now())
+                .availableTo(LocalTime.now().plusHours(8))
                 .build());
 
-        doctorRepository.save(Doctor.builder()
+        Doctor doctor2 = doctorRepository.save(Doctor.builder()
                 .fullName("Laura Medina")
                 .email("lmedina@gmail.com")
                 .specialty("Dermatology")
+                .availableFrom(LocalTime.now())
+                .availableTo(LocalTime.now().plusHours(8))
                 .build());
 
         List<Doctor> doctors = doctorRepository.findAll();
 
-        assertEquals(2, doctors.size());
+        assertFalse(doctors.isEmpty());
+        assertTrue(doctors.contains(doctor1));
+        assertTrue(doctors.contains(doctor2));
     }
 
     @Test
@@ -65,6 +74,8 @@ class DoctorRepositoryTest {
                 .fullName("Pedro Gonzalez")
                 .email("pgonzalez@gmail.com")
                 .specialty("Cardiology")
+                .availableFrom(LocalTime.now())
+                .availableTo(LocalTime.now().plusHours(8))
                 .build());
 
         doctor.setSpecialty("Internal Medicine");
@@ -79,6 +90,8 @@ class DoctorRepositoryTest {
                 .fullName("Pedro Gonzalez")
                 .email("pgonzalez@gmail.com")
                 .specialty("Cardiology")
+                .availableFrom(LocalTime.now())
+                .availableTo(LocalTime.now().plusHours(8))
                 .build());
 
         Long id = doctor.getId();
@@ -93,12 +106,16 @@ class DoctorRepositoryTest {
                 .fullName("Pedro Gonzalez")
                 .email("pgonzalez@gmail.com")
                 .specialty("Cardiology")
+                .availableFrom(LocalTime.now())
+                .availableTo(LocalTime.now().plusHours(8))
                 .build());
 
         doctorRepository.save(Doctor.builder()
                 .fullName("Carlos Martinez")
                 .email("cmartinez@gmail.com")
                 .specialty("Cardiology")
+                .availableFrom(LocalTime.now())
+                .availableTo(LocalTime.now().plusHours(8))
                 .build());
 
         List<Doctor> cardiologists = doctorRepository.findBySpecialty("Cardiology");

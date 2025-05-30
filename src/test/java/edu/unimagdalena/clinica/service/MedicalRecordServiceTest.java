@@ -132,10 +132,16 @@ class MedicalRecordServiceTest {
 
     @Test
     void shouldDeleteMedicalRecord() {
-        when(medicalRecordRepository.existsById(1L)).thenReturn(true);
+        Appointment appointment = Appointment.builder().build();
+        MedicalRecord record = MedicalRecord.builder()
+                .id(1L)
+                .appointment(appointment)
+                .build();
+
+        when(medicalRecordRepository.findById(1L)).thenReturn(Optional.of(record));
 
         medicalRecordService.deleteMedicalRecord(1L);
 
-        verify(medicalRecordRepository).deleteById(1L);
+        verify(medicalRecordRepository).delete(record);
     }
 }

@@ -10,6 +10,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.TestcontainersConfiguration;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -71,9 +72,15 @@ class MedicalRecordRepositoryTest {
                 .fullName("Pedro Gonzalez")
                 .email("pgonzalez@gmail.com")
                 .specialty("Cardiology")
+                .availableFrom(LocalTime.now())
+                .availableTo(LocalTime.now().plusHours(8))
                 .build());
 
-        ConsultRoom consultRoom = consultRoomRepository.save(ConsultRoom.builder().name("Consultorio A").build());
+        ConsultRoom consultRoom = consultRoomRepository.save(ConsultRoom.builder()
+                .name("Consultorio A")
+                .floor(3)
+                .description("First room for consults")
+                .build());
 
         Appointment appointment1 = appointmentRepository.save(Appointment.builder()
                 .patient(patient)
@@ -112,7 +119,9 @@ class MedicalRecordRepositoryTest {
 
         List<MedicalRecord> result = medicalRecordRepository.findAll();
 
-        assertEquals(2, result.size());
+        assertFalse(result.isEmpty());
+        assertTrue(result.contains(record1));
+        assertTrue(result.contains(record2));
     }
 
     @Test

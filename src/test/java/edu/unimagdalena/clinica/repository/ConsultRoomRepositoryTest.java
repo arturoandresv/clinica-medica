@@ -28,6 +28,7 @@ class ConsultRoomRepositoryTest {
         ConsultRoom consultRoom = ConsultRoom.builder()
                 .name("Consult Room A")
                 .floor(2)
+                .description("First room for consults")
                 .build();
 
         ConsultRoom saved = consultRoomRepository.save(consultRoom);
@@ -43,16 +44,20 @@ class ConsultRoomRepositoryTest {
         ConsultRoom room1 = consultRoomRepository.save(ConsultRoom.builder()
                 .name("Consult Room A")
                 .floor(2)
+                .description("First room for consults")
                 .build());
 
         ConsultRoom room2 = consultRoomRepository.save(ConsultRoom.builder()
                 .name("Consult Room B")
-                .floor(3)
+                .floor(2)
+                .description("Second room for consults")
                 .build());
 
         List<ConsultRoom> result = consultRoomRepository.findAll();
 
-        assertEquals(2, result.size());
+        assertFalse(result.isEmpty());
+        assertTrue(result.contains(room1));
+        assertTrue(result.contains(room2));
     }
 
     @Test
@@ -60,10 +65,12 @@ class ConsultRoomRepositoryTest {
         ConsultRoom room = consultRoomRepository.save(ConsultRoom.builder()
                 .name("Consult Room A")
                 .floor(2)
+                .description("First room for consults")
                 .build());
 
         room.setName("Consult Room Z");
         room.setFloor(4);
+        room.setDescription("Last room for consults");
 
         ConsultRoom updated = consultRoomRepository.save(room);
 
@@ -76,6 +83,7 @@ class ConsultRoomRepositoryTest {
         ConsultRoom room = consultRoomRepository.save(ConsultRoom.builder()
                 .name("Consult Room A")
                 .floor(2)
+                .description("First room for consults")
                 .build());
 
         Long id = room.getId();

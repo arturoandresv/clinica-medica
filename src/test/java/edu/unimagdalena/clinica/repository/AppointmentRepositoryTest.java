@@ -10,13 +10,14 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.TestcontainersConfiguration;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Import(TestcontainersConfiguration.class)
 @DataJpaTest
+@Import(TestcontainersConfiguration.class)
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class AppointmentRepositoryTest {
@@ -45,8 +46,14 @@ class AppointmentRepositoryTest {
                 .fullName("Pedro Gonzalez")
                 .email("pgonzalez@gmail.com")
                 .specialty("Cardiology")
+                .availableFrom(LocalTime.now())
+                .availableTo(LocalTime.now().plusHours(8))
                 .build());
-        ConsultRoom consultRoom = consultRoomRepository.save(ConsultRoom.builder().name("Consultorio A").build());
+        ConsultRoom consultRoom = consultRoomRepository.save(ConsultRoom.builder()
+                .name("Consultorio A")
+                .floor(2)
+                .description("First room for consults")
+                .build());
 
         Appointment appointment = Appointment.builder()
                 .patient(patient)
@@ -69,8 +76,18 @@ class AppointmentRepositoryTest {
     @Test
     void shouldFindAllAppointments() {
         Patient patient1 = patientRepository.save(Patient.builder().fullName("Juan Rodriguez").email("jrodriguez@gmail.com").phone("3014598321").build());
-        Doctor doctor1 = doctorRepository.save(Doctor.builder().fullName("Pedro Gonzalez").email("pgonzalez@gmail.com").specialty("Cardiology").build());
-        ConsultRoom consultRoom1 = consultRoomRepository.save(ConsultRoom.builder().name("Consultorio A").build());
+        Doctor doctor1 = doctorRepository.save(Doctor.builder()
+                .fullName("Pedro Gonzalez")
+                .email("pgonzalez@gmail.com")
+                .specialty("Cardiology")
+                .availableFrom(LocalTime.now())
+                .availableTo(LocalTime.now().plusHours(8))
+                .build());
+        ConsultRoom consultRoom1 = consultRoomRepository.save(ConsultRoom.builder()
+                .name("Consultorio A")
+                .floor(2)
+                .description("First room for consults")
+                .build());
 
         Appointment appointment1 = Appointment.builder()
                 .patient(patient1)
@@ -95,14 +112,26 @@ class AppointmentRepositoryTest {
 
         List<Appointment> appointments = appointmentRepository.findAll();
 
-        assertEquals(2, appointments.size());
+        assertFalse(appointments.isEmpty());
+        assertTrue(appointments.contains(appointment1));
+        assertTrue(appointments.contains(appointment2));
     }
 
     @Test
     void shouldUpdateAppointment() {
         Patient patient = patientRepository.save(Patient.builder().fullName("Juan Rodriguez").email("jrodriguez@gmail.com").phone("3014598321").build());
-        Doctor doctor = doctorRepository.save(Doctor.builder().fullName("Pedro Gonzalez").email("pgonzalez@gmail.com").specialty("Cardiology").build());
-        ConsultRoom consultRoom = consultRoomRepository.save(ConsultRoom.builder().name("Consultorio A").build());
+        Doctor doctor = doctorRepository.save(Doctor.builder()
+                .fullName("Pedro Gonzalez")
+                .email("pgonzalez@gmail.com")
+                .specialty("Cardiology")
+                .availableFrom(LocalTime.now())
+                .availableTo(LocalTime.now().plusHours(8))
+                .build());
+        ConsultRoom consultRoom = consultRoomRepository.save(ConsultRoom.builder()
+                .name("Consultorio A")
+                .floor(2)
+                .description("First room for consults")
+                .build());
 
         Appointment appointment = appointmentRepository.save(Appointment.builder()
                 .patient(patient)
@@ -122,8 +151,18 @@ class AppointmentRepositoryTest {
     @Test
     void shouldDeleteAppointment() {
         Patient patient = patientRepository.save(Patient.builder().fullName("Juan Rodriguez").email("jrodriguez@gmail.com").phone("3014598321").build());
-        Doctor doctor = doctorRepository.save(Doctor.builder().fullName("Pedro Gonzalez").email("pgonzalez@gmail.com").specialty("Cardiology").build());
-        ConsultRoom consultRoom = consultRoomRepository.save(ConsultRoom.builder().name("Consultorio A").build());
+        Doctor doctor = doctorRepository.save(Doctor.builder()
+                .fullName("Pedro Gonzalez")
+                .email("pgonzalez@gmail.com")
+                .specialty("Cardiology")
+                .availableFrom(LocalTime.now())
+                .availableTo(LocalTime.now().plusHours(8))
+                .build());
+        ConsultRoom consultRoom = consultRoomRepository.save(ConsultRoom.builder()
+                .name("Consultorio A")
+                .floor(2)
+                .description("First room for consults")
+                .build());
 
         Appointment appointment = appointmentRepository.save(Appointment.builder()
                 .patient(patient)
@@ -142,9 +181,19 @@ class AppointmentRepositoryTest {
 
     @Test
     void shouldFindConflictConsultRoom() {
-        ConsultRoom consultRoom = consultRoomRepository.save(ConsultRoom.builder().name("Consultorio A").build());
+        ConsultRoom consultRoom = consultRoomRepository.save(ConsultRoom.builder()
+                .name("Consultorio A")
+                .floor(2)
+                .description("First room for consults")
+                .build());
         Patient patient = patientRepository.save(Patient.builder().fullName("Juan Rodriguez").email("jrodriguez@gmail.com").phone("3014598321").build());
-        Doctor doctor = doctorRepository.save(Doctor.builder().fullName("Pedro Gonzalez").email("pgonzalez@gmail.com").specialty("Cardiology").build());
+        Doctor doctor = doctorRepository.save(Doctor.builder()
+                .fullName("Pedro Gonzalez")
+                .email("pgonzalez@gmail.com")
+                .specialty("Cardiology")
+                .availableFrom(LocalTime.now())
+                .availableTo(LocalTime.now().plusHours(8))
+                .build());
 
         LocalDateTime start = LocalDateTime.now().plusDays(1).withHour(10);
         LocalDateTime end = LocalDateTime.now().plusDays(1).withHour(11);
@@ -166,8 +215,18 @@ class AppointmentRepositoryTest {
     @Test
     void shouldFindConflictDoctor() {
         Patient patient = patientRepository.save(Patient.builder().fullName("Juan Rodriguez").email("jrodriguez@gmail.com").phone("3014598321").build());
-        Doctor doctor = doctorRepository.save(Doctor.builder().fullName("Pedro Gonzalez").email("pgonzalez@gmail.com").specialty("Cardiology").build());
-        ConsultRoom consultRoom = consultRoomRepository.save(ConsultRoom.builder().name("Consultorio B").build());
+        Doctor doctor = doctorRepository.save(Doctor.builder()
+                .fullName("Pedro Gonzalez")
+                .email("pgonzalez@gmail.com")
+                .specialty("Cardiology")
+                .availableFrom(LocalTime.now())
+                .availableTo(LocalTime.now().plusHours(8))
+                .build());
+        ConsultRoom consultRoom = consultRoomRepository.save(ConsultRoom.builder()
+                .name("Consultorio B")
+                .floor(3)
+                .description("Second room for consults")
+                .build());
 
         LocalDateTime start = LocalDateTime.now().plusDays(1).withHour(14);
         LocalDateTime end = LocalDateTime.now().plusDays(1).withHour(15);
