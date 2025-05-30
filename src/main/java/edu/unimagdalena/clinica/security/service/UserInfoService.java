@@ -62,7 +62,7 @@ public class UserInfoService implements UserDetailsService {
         }
 
         User user = User.builder()
-                .username(userInfo.username())
+                .username(userInfo.email())
                 .email(userInfo.email())
                 .password(encoder.encode(userInfo.password()))
                 .build();
