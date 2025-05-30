@@ -67,11 +67,11 @@ public class AppointmentServiceImpl implements AppointmentService {
                 findConflictConsultRoom(appointmentRequestCreateDTO.consultRoomId(), appointmentRequestCreateDTO.startTime(), appointmentRequestCreateDTO.endTime());
 
         if (!doctorConflicts.isEmpty() && !consultRoomConflicts.isEmpty()) {
-            throw new AppointmentConflictException("Doctor and consult room have an appointment at this time.");
+            throw new AppointmentConflictException("Doctor and consult room have an appointment at this time");
         } else if (!doctorConflicts.isEmpty()) {
-            throw new AppointmentConflictException("The doctor already has an appointment at this time.");
+            throw new AppointmentConflictException("The doctor already has an appointment at this time");
         } else if (!consultRoomConflicts.isEmpty()) {
-            throw new AppointmentConflictException("The consult room already has an appointment at this time.");
+            throw new AppointmentConflictException("The consult room already has an appointment at this time");
         }
         long duration = Duration.between(appointmentRequestCreateDTO.startTime(), appointmentRequestCreateDTO.endTime()).toMinutes();
         if(duration < 30 || duration > 180) {
