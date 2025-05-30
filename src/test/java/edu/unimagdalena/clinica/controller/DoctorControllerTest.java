@@ -1,10 +1,12 @@
 package edu.unimagdalena.clinica.controller;
 
 import edu.unimagdalena.clinica.dto.response.DoctorResponseDTO;
+import edu.unimagdalena.clinica.security.jwt.JwtFilter;
 import edu.unimagdalena.clinica.service.DoctorService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -23,6 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(DoctorController.class)
+@AutoConfigureMockMvc(addFilters = false)
 @Import(DoctorControllerTest.MockConfig.class)
 class DoctorControllerTest {
 
@@ -34,6 +37,10 @@ class DoctorControllerTest {
         @Bean
         public DoctorService doctorService() {
             return Mockito.mock(DoctorService.class);
+        }
+        @Bean
+        public JwtFilter jwtFilter() {
+            return Mockito.mock(JwtFilter.class);
         }
     }
 

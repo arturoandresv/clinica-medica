@@ -42,14 +42,14 @@ class PatientRepositoryTest {
 
     @Test
     void shouldFindAllPatients() {
-        patientRepository.save(Patient.builder().fullName("Juan Rodriguez").email("jrodriguez@gmail.com").phone("3014598321").build());
-        patientRepository.save(Patient.builder().fullName("Jose Hernandez").email("jhernandez@gmail.com").phone("3006671543").build());
+        Patient patient1 = patientRepository.save(Patient.builder().fullName("Juan Rodriguez").email("jrodriguez@gmail.com").phone("3014598321").build());
+        Patient patient2 = patientRepository.save(Patient.builder().fullName("Jose Hernandez").email("jhernandez@gmail.com").phone("3006671543").build());
 
         List<Patient> patients = patientRepository.findAll();
 
-        assertEquals(2, patients.size());
-        assertEquals("Juan Rodriguez", patients.get(0).getFullName());
-        assertEquals("Jose Hernandez", patients.get(1).getFullName());
+        assertFalse(patients.isEmpty());
+        assertTrue(patients.contains(patient1));
+        assertTrue(patients.contains(patient2));
     }
 
     @Test

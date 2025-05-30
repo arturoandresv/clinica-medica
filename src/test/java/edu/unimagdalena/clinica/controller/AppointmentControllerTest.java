@@ -2,10 +2,12 @@ package edu.unimagdalena.clinica.controller;
 
 import edu.unimagdalena.clinica.dto.response.AppointmentResponseDTO;
 import edu.unimagdalena.clinica.model.AppointmentStatus;
+import edu.unimagdalena.clinica.security.jwt.JwtFilter;
 import edu.unimagdalena.clinica.service.AppointmentService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -26,6 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AppointmentController.class)
+@AutoConfigureMockMvc(addFilters = false)
 @Import(AppointmentControllerTest.MockConfig.class)
 class AppointmentControllerTest {
 
@@ -38,7 +41,13 @@ class AppointmentControllerTest {
         public AppointmentService appointmentService() {
             return Mockito.mock(AppointmentService.class);
         }
+        @Bean
+        public JwtFilter jwtFilter() {
+            return Mockito.mock(JwtFilter.class);
+        }
     }
+
+
 
     private AppointmentResponseDTO createAppointmentResponseDTO() {
         return AppointmentResponseDTO.builder()
