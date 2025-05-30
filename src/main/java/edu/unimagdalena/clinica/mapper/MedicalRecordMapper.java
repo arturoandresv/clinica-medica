@@ -11,9 +11,13 @@ public interface MedicalRecordMapper {
 
     @Mapping(source = "appointment.id", target = "appointmentId")
     @Mapping(source = "patient.id", target = "patientId")
+    @Mapping(source = "appointment.doctor.fullName", target = "doctorFullName")
+    @Mapping(source = "appointment.doctor.id", target = "doctorId")
+    @Mapping(source = "patient.fullName", target = "patientFullName")
     MedicalRecordResponseDTO toDTO(MedicalRecord medicalRecord);
 
     @Mapping(target = "appointment", ignore = true)
     @Mapping(target = "patient", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
     MedicalRecord toEntity(MedicalRecordRequestDTO medicalRecordRequestDTO);
 }
