@@ -10,3 +10,8 @@ docker run --name postgres-pweb \
 # Crear Roles
 INSERT into roles (name) VALUES ('USER'); \
 INSERT INTO roles (name) values ('ADMIN');
+
+# Crear Admin
+INSERT INTO users (username, email, password) \
+VALUES ( 'admin@clinica.com', 'admin@clinica.com', '$2a$10$kVXIdRHi9wZqR1ntLzQ43OrhTWIivZqArVNO.f6ivltVxkzE7YHeW'); \
+-- password: '123456'
