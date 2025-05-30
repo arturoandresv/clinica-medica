@@ -10,6 +10,5 @@ import java.time.LocalDateTime;
 public record MedicalRecordRequestDTO(@NotNull Long appointmentId,
                                       @NotNull Long patientId,
                                       @NotBlank String diagnosis,
-                                      @NotBlank String notes,
-                                      @NotNull LocalDateTime createdAt) {
+                                      @NotBlank String notes) {
 }
